@@ -1,0 +1,106 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Common Patterns & Code Snippets
+
+## React Leaflet Map Setup
+```tsx
+import { MapContainer, TileLayer, useMap } from "react-leaflet"
+import "leaflet/dist/leaflet.css"
+import L from "leaflet"
+
+// Fix default markers
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "/placeholder.svg?height=25&width=25",
+  iconUrl: "/placeholder.svg?height=25&width=25",
+  shadowUrl: "/placeholder.svg?height=25&width=25",
+})
+
+const BENGALURU_CENTER: [number, number] = [12.9716, 77.5946]
+```
+
+## shadcn/ui Component Usage
+```tsx
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+
+// Use consistent styling patterns
+<Button size="icon" className="h-12 w-12 rounded-full shadow-lg">
+  <Icon className="h-5 w-5" />
+</Button>
+```
+
+## Cloudflare Workers Endpoint Pattern
+```typescript
+import { OpenAPIRoute } from "chanfana"
+import { z } from "zod"
+
+export class TaskCreate extends OpenAPIRoute {
+  schema = {
+    tags: ["Tasks"],
+    summary: "Create a new task",
+    request: {
+      body: {
+        content: {
+          "application/json": {
+            schema: z.object({
+              name: z.string(),
+              description: z.string().optional(),
+            }),
+          },
+        },
+      },
+    },
+    responses: {
+      "200": {
+        description: "Task created successfully",
+        content: {
+          "application/json": {
+            schema: z.object({
+              success: z.boolean(),
+              result: z.object({
+                id: z.string(),
+                name: z.string(),
+              }),
+            }),
+          },
+        },
+      },
+    },
+  }
+
+  async handle(request: Request, env: any, context: any, data: any) {
+    // Implementation here
+  }
+}
+```
+
+## TypeScript Type Patterns
+```typescript
+// API Response types
+interface ApiResponse<T> {
+  success: boolean
+  result?: T
+  error?: string
+}
+
+// Map layer configuration
+interface MapLayer {
+  name: string
+  url: string
+  attribution: string
+  icon: React.ComponentType
+}
+```
+
+## Tailwind CSS Patterns
+- **Responsive**: `sm:`, `md:`, `lg:`, `xl:` prefixes
+- **Dark Mode**: `dark:` prefix for dark theme styles
+- **Spacing**: Use consistent spacing scale (4, 8, 12, 16, etc.)
+- **Colors**: Use semantic color names from theme
+- **Shadows**: `shadow-sm`, `shadow-md`, `shadow-lg` for depth
+

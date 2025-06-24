@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "civic-delusion-api",
+	"name": "open-urban-eyesore-api",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-06-04",
 	"observability": {

@@ -1,0 +1,46 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Workflow & Best Practices
+
+## Getting Started
+1. **Frontend Development**: `cd ui && pnpm install && pnpm dev`
+2. **Backend Development**: `cd api && pnpm install && pnpm dev`
+3. **Full Stack**: Run both commands in separate terminals
+
+## Code Style & Standards
+- **Package Manager**: Use `pnpm` exclusively
+- **TypeScript**: Strict mode enabled, use proper typing
+- **Components**: Use shadcn/ui components from `ui/components/ui/`
+- **Styling**: Tailwind CSS classes, avoid custom CSS when possible
+- **Validation**: Use Zod schemas for API validation
+
+## Map Development Guidelines
+- **Leaflet Integration**: Use React Leaflet components
+- **Coordinates**: Bengaluru center is `[12.9716, 77.5946]`
+- **Tile Layers**: Configured in `MAP_LAYERS` object in [map-screen.tsx](mdc:ui/components/map-screen.tsx)
+- **Icons**: Fix Leaflet default icons as shown in map component
+
+## API Development Guidelines
+- **Endpoints**: Create new endpoints in [api/src/endpoints/](mdc:api/src/endpoints)
+- **OpenAPI**: Use Chanfana decorators for API documentation
+- **Validation**: Define Zod schemas for request/response validation
+- **Error Handling**: Use proper HTTP status codes
+
+## File Organization
+- **Components**: Place reusable UI components in `ui/components/`
+- **Hooks**: Custom React hooks go in `ui/hooks/`
+- **Utils**: Utility functions in `ui/lib/`
+- **Types**: Shared types in respective `types.ts` files
+
+## Docker Considerations
+- **Architecture**: Build images for AMD64 architecture
+- **Multi-stage**: Use multi-stage builds for optimization
+
+## Deployment
+- **Frontend**: Next.js deployment (Vercel recommended)
+- **Backend**: Cloudflare Workers via `wrangler deploy`
+- **Environment**: Configure environment variables in respective platforms
+
