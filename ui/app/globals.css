@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Leaflet map fixes */
+.leaflet-container {
+  height: 100dvh !important;
+  width: 100dvw !important;
+  background: #f8f9fa;
+}
+
+.leaflet-tile-container {
+  pointer-events: auto;
+}
+
+.leaflet-tile {
+  pointer-events: auto;
+}
+
+/* Ensure map takes full space */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#__next {
+  height: 100%;
+  width: 100%;
+}
+
+/* Fix for map not loading properly */
+.leaflet-map-pane {
+  z-index: 1;
+}
+
+.leaflet-tile-pane {
+  z-index: 1;
+}
+
+@keyframes breathing {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 14px 0 rgb(0,118,255,39%);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 4px 20px 0 rgb(0,118,255,50%);
+  }
+}
