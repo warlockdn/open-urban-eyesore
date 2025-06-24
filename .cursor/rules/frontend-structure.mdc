@@ -1,0 +1,41 @@
+---
+description: 
+globs: ui/**
+alwaysApply: false
+---
+# Frontend Structure Guide
+
+The UI is built with Next.js 15 using the App Router pattern.
+Uses shadcn library.
+
+## Key Files
+- **Entry Point**: [page.tsx](mdc:ui/app/page.tsx) - Main application page
+- **Layout**: [layout.tsx](mdc:ui/app/layout.tsx) - Root layout with theme provider
+- **Main Component**: [map-screen.tsx](mdc:ui/components/map-screen.tsx) - Core map interface
+- **Theme Provider**: [theme-provider.tsx](mdc:ui/components/theme-provider.tsx) - Dark/light theme support
+- **Global Styles**: [globals.css](mdc:ui/app/globals.css) - Tailwind base styles
+
+## Directory Structure
+- `ui/app/` - Next.js App Router pages and layouts
+- `ui/components/` - React components
+- `ui/components/ui/` - shadcn/ui reusable components
+- `ui/hooks/` - Custom React hooks
+- `ui/lib/` - Utility functions and configurations
+- `ui/public/` - Static assets
+- `ui/styles/` - Additional stylesheets
+
+## Configuration Files
+- [package.json](mdc:ui/package.json) - Dependencies and scripts
+- [next.config.mjs](mdc:ui/next.config.mjs) - Next.js configuration
+- [tailwind.config.ts](mdc:ui/tailwind.config.ts) - Tailwind CSS configuration
+- [tsconfig.json](mdc:ui/tsconfig.json) - TypeScript configuration
+- [components.json](mdc:ui/components.json) - shadcn/ui configuration
+
+## Map Features
+The main map component includes:
+- Multiple tile layer options (Street, Satellite, Terrain, Dark, Light, Watercolor)
+- Zoom controls and reset functionality
+- Responsive design with mobile-friendly UI
+- Loading states and error handling
+- Bengaluru-centered default view (12.9716, 77.5946)
+

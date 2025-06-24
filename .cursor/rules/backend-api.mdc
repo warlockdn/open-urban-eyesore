@@ -1,0 +1,35 @@
+---
+description: 
+globs: api/**
+alwaysApply: false
+---
+# Backend API Structure
+
+The API is built with Cloudflare Workers using Hono framework and OpenAPI integration.
+
+## Key Files
+- **Entry Point**: [index.ts](mdc:api/src/index.ts) - Main worker entry point
+- **Types**: [types.ts](mdc:api/src/types.ts) - Shared TypeScript types
+- **Configuration**: [wrangler.jsonc](mdc:api/wrangler.jsonc) - Cloudflare Workers config
+
+## API Endpoints
+
+## Technology Stack
+- **Runtime**: Cloudflare Workers
+- **Framework**: Hono for HTTP handling
+- **OpenAPI**: Chanfana for API documentation and validation
+- **Validation**: Zod schemas for type safety
+- **Deployment**: Wrangler CLI
+
+## Development
+- **Dev Server**: `pnpm dev` - Starts local development server
+- **Deploy**: `pnpm deploy` - Deploys to Cloudflare Workers
+- **Type Generation**: `pnpm cf-typegen` - Generates Cloudflare types
+- **Use cache as much as possible** - In get requests always prefer caching, when updating, update the cache
+
+## Configuration Files
+- [package.json](mdc:api/package.json) - Dependencies and scripts
+- [tsconfig.json](mdc:api/tsconfig.json) - TypeScript configuration
+- [worker-configuration.d.ts](mdc:api/worker-configuration.d.ts) - Generated Cloudflare types
+
+

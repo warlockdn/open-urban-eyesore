@@ -1,0 +1,36 @@
+---
+description: 
+globs: api/**,ui/**
+alwaysApply: false
+---
+# Bengaluru Map Project Overview
+
+This is a full-stack Bengaluru map application with a Next.js frontend and Cloudflare Workers API backend.
+
+## Architecture
+- **Frontend**: Next.js 15 with React 19, TypeScript, Tailwind CSS, and shadcn/ui components
+- **Backend**: Cloudflare Workers with Hono framework and OpenAPI integration
+- **Map Library**: React Leaflet for interactive mapping
+- **Styling**: Tailwind CSS with custom components and themes
+
+## Key Technologies
+- **UI Framework**: Next.js 15 (App Router), React 19
+- **Map Integration**: Leaflet + React Leaflet for interactive maps
+- **UI Components**: shadcn/ui with Radix UI primitives
+- **Styling**: Tailwind CSS with custom animations
+- **Backend**: Cloudflare Workers, Hono, Chanfana (OpenAPI)
+- **Type Safety**: TypeScript throughout, Zod for validation
+- **Package Manager**: pnpm
+
+## Project Structure
+- `ui/` - Next.js frontend application
+- `api/` - Cloudflare Workers backend API
+- Main map component: [map-screen.tsx](mdc:ui/components/map-screen.tsx)
+- API endpoints in [api/src/endpoints/](mdc:api/src/endpoints)
+
+## Development Commands
+- Frontend: `cd ui && pnpm dev`
+- Backend: `cd api && pnpm dev`
+- Deploy API: `cd api && pnpm deploy`
+
+
