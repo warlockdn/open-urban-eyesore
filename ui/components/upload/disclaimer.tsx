@@ -7,46 +7,71 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { useRouter } from "next/navigation"
+} from '@/components/ui/alert-dialog';
+import { useRouter } from 'next/navigation';
 
-export function DisclaimerAlert({ open, setOpen }: { open: boolean, setOpen: (open: boolean) => void }) {
-  const router = useRouter()
+export function DisclaimerAlert({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) {
+  const router = useRouter();
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent className="max-w-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>🚧 Upload Responsibly</AlertDialogTitle>
+          <AlertDialogTitle>🚧 Upload Guidelines</AlertDialogTitle>
           <AlertDialogDescription>
-          Help keep our roads safe — this platform is built by the community, for the community.
-<br />
-Upload clear photos of potholes only.
-<br />
-No NSFW, offensive, violent, or unrelated content.
-<br />
-Avoid personal info (faces, license plates, house numbers, etc.).
-<br />
-👉 Use the platform wisely.
-<br />
-Your responsible uploads helps everyone.
-<br /><br />
-<strong>Note:</strong> <br />
-<strong>All location data and personal metadata are automatically stripped from images before upload.</strong>
-<br />
-<strong>Your uploads remain completely anonymous - we cannot trace images back to you.</strong>
-<br />
-<strong>This platform ensures privacy while helping improve road safety.</strong>
+            <p className="mb-3">
+              <strong>What to upload:</strong>
+            </p>
+            <ul className="list-disc pl-5 mb-4 space-y-1">
+              <li>Clear photos of potholes and road damage</li>
+              <li>Images that help identify the location and severity</li>
+            </ul>
+
+            <p className="mb-3">
+              <strong>What not to upload:</strong>
+            </p>
+            <ul className="list-disc pl-5 mb-4 space-y-1">
+              <li>Inappropriate, violent, or offensive content</li>
+              <li>Personal information (faces, license plates, addresses)</li>
+              <li>Unrelated images or spam</li>
+            </ul>
+
+            <p className="mb-3">
+              <strong>Privacy protection:</strong>
+            </p>
+            <ul className="list-disc pl-5 mb-4 space-y-1">
+              <li>Location data is automatically removed from your images</li>
+              <li>Personal metadata is stripped before upload</li>
+              <li>Your uploads are completely anonymous</li>
+              <li>We cannot trace images back to you</li>
+            </ul>
+
+            <p className="text-sm text-muted-foreground">
+              By uploading, you help improve road safety for everyone in the
+              community.
+            </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => {
-            setOpen(false)
-            router.back()
-          }}>I don't understand</AlertDialogCancel>
-          <AlertDialogAction onClick={() => setOpen(false)}>I understand</AlertDialogAction>
+          <AlertDialogCancel
+            onClick={() => {
+              setOpen(false);
+              router.back();
+            }}
+          >
+            Go back
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={() => setOpen(false)}>
+            I understand and agree
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
