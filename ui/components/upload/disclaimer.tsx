@@ -24,7 +24,7 @@ export function DisclaimerAlert({
       <AlertDialogContent className="max-w-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>🚧 Upload Guidelines</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-left">
             <p className="mb-3">
               <strong>What to upload:</strong>
             </p>
