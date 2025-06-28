@@ -75,6 +75,9 @@ export default function FileUpload({
         )
       case "uploading":
         return file ? <UploadingView file={file} progress={progress} resetState={resetState} /> : null
+      case "awaiting-location":
+      case "locating":
+        return file ? <UploadingView file={file} progress={50} resetState={resetState} /> : null
       case "success":
         return file ? <SuccessView file={file} formatBytes={formatBytes} resetState={resetState} /> : null
       case "error":

@@ -9,7 +9,7 @@ import useImageKitUpload from "@/components/upload/imagekit";
 import { useIsMobile } from "@/components/ui/use-mobile";
 import { convertExifToFormattedString, isInBengaluru, reportToSentry } from "@/lib/utils";
 
-export type UploadStatus = "idle" | "dragging" | "uploading" | "success" | "error"
+export type UploadStatus = "idle" | "dragging" | "uploading" | "success" | "error" | "locating" | "awaiting-location"
 
 export interface FileUploadHookProps {
   onUploadError?: (error: string) => void
@@ -32,7 +32,6 @@ export function useFileUpload({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [captureMode, setCaptureMode] = useState<"user" | "environment" | false>(false)
   const isMobile = useIsMobile()
-  const capturedLocation = useRef<{ lat: number; lng: number } | null>(null);
   const [exif, setExif] = useState<exifReader.Tags | null>(null);
 
   const { handleUpload } = useImageKitUpload()
@@ -152,8 +151,13 @@ export function useFileUpload({
         let errorDescription = "Please try again later"
 
         if (error.message === "Invalid GPS data") {
-          errorMessage = "No GPS data found"
-          errorDescription = "Please ensure the image has GPS data."
+          if (captureMode === "environment" || fileInputRef.current?.capture === "environment") {
+            errorMessage = "No GPS data found"
+            errorDescription = "Looks like you may have denied location access. Please enable location access and try again. Check the FAQ for more details."
+          } else {
+            errorMessage = "No GPS data found"
+            errorDescription = "Please ensure the image has GPS data."
+          }
         } else if (error.message === "Failed to generate upload token") {
           errorMessage = "Failed to generate upload token"
         }
@@ -206,8 +210,57 @@ export function useFileUpload({
     return { lat, lng };
   }, [])
 
+  const requestLocationForCapturedPhoto = useCallback(
+    (selectedFile: File) => {
+      if (!navigator.geolocation) {
+        toast.error("Geolocation is not supported by your browser.", { position: "top-center" })
+        resetState()
+        return
+      }
+
+      toast.info("Getting your location...", { position: "top-center" })
+      setStatus("locating")
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude
+          const lng = position.coords.longitude
+
+          // check for bangalore
+          if (!isInBengaluru(lat, lng)) {
+            toast.error("You are not in Bengaluru. Please upload the image from Bengaluru.", {
+              description: "This is to ensure that the image is relevant to the city of Bengaluru.",
+              position: "top-center",
+            })
+            resetState()
+            return
+          }
+
+          toast.success("Location found! Uploading image...", { position: "top-center" })
+          setStatus("uploading")
+          setProgress(0)
+          simulateUpload()
+          await performUpload(selectedFile, lat, lng)
+        },
+        (error) => {
+          toast.error("Could not get your location.", {
+            description: "Please enable location services and try again.",
+            position: "top-center",
+          })
+          resetState()
+          reportToSentry(new Error("Could not get your location."), {
+            userAgent: navigator.userAgent,
+            error: error,
+          })
+        },
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+      )
+    },
+    [performUpload],
+  )
+
   const handleFileSelect = useCallback(
-    async (selectedFile: File | null) => {
+    async (selectedFile: File | null, currentCaptureMode?: "user" | "environment" | false) => {
       if (!selectedFile || !handleFileValidation(selectedFile)) {
         setFile(null)
         return
@@ -215,24 +268,21 @@ export function useFileUpload({
 
       setFile(selectedFile)
       setError(null)
-      setStatus("uploading")
-      setProgress(0)
-      simulateUpload()
 
-      if (capturedLocation.current) {
-        const { lat, lng } = capturedLocation.current;
-        capturedLocation.current = null;
+      // Use the passed capture mode or fall back to current state
+      const effectiveCaptureMode = currentCaptureMode !== undefined ? currentCaptureMode : captureMode
 
-        const exifData = exifReader.load(await selectedFile.arrayBuffer());
-        const { lat: validatedLat, lng: validatedLng } = await performValidations(exifData);
-
-        if (validatedLat === -1 || validatedLng === -1) {
-          resetState();
-          return;
-        }
-
-        await performUpload(selectedFile, lat, lng)
+      // this is for the camera capture - now we ask for location after photo is taken
+      if (effectiveCaptureMode === "environment") {
+        setStatus("awaiting-location")
+        toast.success("Photo captured! Now getting your location...", { position: "top-center" })
+        requestLocationForCapturedPhoto(selectedFile)
       } else {
+        // regular file upload with EXIF data
+        setStatus("uploading")
+        setProgress(0)
+        simulateUpload()
+
         const reader = new FileReader()
         reader.onload = async (e) => {
           try {
@@ -261,7 +311,7 @@ export function useFileUpload({
         reader.readAsArrayBuffer(selectedFile)
       }
     },
-    [handleFileValidation, performUpload],
+    [handleFileValidation, performUpload, requestLocationForCapturedPhoto, captureMode],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -300,9 +350,7 @@ export function useFileUpload({
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const wasCapture = !!captureMode
-    if (captureMode) {
-      setCaptureMode(false)
-    }
+    const captureModeCopy = captureMode
 
     const selectedFile = e.target.files?.[0]
     if (e.target) e.target.value = ""
@@ -315,40 +363,17 @@ export function useFileUpload({
       return
     }
 
-    if (wasCapture) {
-      if (!navigator.geolocation) {
-        toast.error("Geolocation is not supported by your browser.", { position: "top-center" })
-        return
-      }
-
-      toast.info("Getting your location...", { position: "top-center" })
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          capturedLocation.current = { lat: position.coords.latitude, lng: position.coords.longitude }
-          toast.success("Location found.", { position: "top-center" })
-          handleFileSelect(selectedFile)
-        },
-        (error) => {
-          console.error("Error getting location", error)
-          toast.error("Could not get your location.", {
-            description: "Please enable location services and try again.",
-            position: "top-center",
-          })
-          resetState()
-          reportToSentry(new Error("Could not get your location."), {
-            userAgent: navigator.userAgent,
-          });
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-      )
-    } else {
-      handleFileSelect(selectedFile)
+    // Pass the capture mode to handleFileSelect before resetting it
+    handleFileSelect(selectedFile, captureModeCopy)
+    
+    // Reset capture mode after file selection
+    if (captureMode) {
+      setCaptureMode(false)
     }
   }
 
   const triggerFileInput = () => {
-    if (status === "uploading" || status === "success") return
+    if (status === "uploading" || status === "success" || status === "locating" || status === "awaiting-location") return
     fileInputRef.current?.click()
   }
 
@@ -395,7 +420,8 @@ export function useFileUpload({
   }, [captureMode, resetState])
 
   const handleCaptureClick = () => {
-    setCaptureMode("environment")
+    toast.info("Taking photo...", { position: "top-center" })
+    setCaptureMode("environment");
   }
 
   const formatBytes = (bytes: number, decimals = 2): string => {

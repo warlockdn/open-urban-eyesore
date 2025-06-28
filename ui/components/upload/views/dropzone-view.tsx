@@ -104,7 +104,7 @@ export function DropzoneView({
           : "SVG, PNG, JPG or GIF"}{" "}
         {maxFileSize && `(Max ${formatBytes(maxFileSize)})`}
       </p>
-      {/* {isMobile && (
+      {isMobile && (
         <>
           <div className="relative flex items-center my-4 w-full max-w-xs">
             <div className="flex-grow border-t border-zinc-300 dark:border-zinc-700" />
@@ -124,7 +124,7 @@ export function DropzoneView({
             Capture Photo
           </Button>
         </>
-      )} */}
+      )}
     </motion.div>
   )
 } 
