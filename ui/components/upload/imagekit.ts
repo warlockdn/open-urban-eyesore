@@ -79,7 +79,6 @@ const useImageKitUpload = () => {
         fileName: randomFileNameGenerator() + file.name.split(".").pop(),
         // Progress callback to update upload progress state
         onProgress: (event) => {
-          console.log("Upload progress:", event);
           // setProgress((event.loaded / event.total) * 100);
         },
         abortSignal: abortController.signal,
