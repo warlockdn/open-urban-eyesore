@@ -1,17 +1,14 @@
 "use client"
 
-import { useState } from "react"
 import { DisclaimerAlert } from "@/components/upload/disclaimer"
+import { useState } from "react"
 import dynamic from "next/dynamic"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { FAQ } from "@/components/upload/faq";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 
-function FileUploadSkeleton() {
+function MultiUploadSkeleton() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md mx-auto">
       <Skeleton className="w-full h-64" />
@@ -19,15 +16,15 @@ function FileUploadSkeleton() {
   )
 }
 
-const FileUpload = dynamic(
-  () => import("@/components/upload/upload"),
+const MultiUpload = dynamic(
+  () => import("@/components/multi-upload/multi-upload"),
   {
     ssr: false,
-    loading: () => <FileUploadSkeleton />,
+    loading: () => <MultiUploadSkeleton />,
   }
 )
 
-export default function UploadPage() {
+export default function MultiUploadPage() {
   const [open, setOpen] = useState(true)
 
   return (
@@ -37,7 +34,7 @@ export default function UploadPage() {
 
         <div className="flex flex-col items-center justify-evenly min-h-screen gap-4">
           <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Upload your image</h1>
+            <h1 className="text-2xl font-bold mb-4">Upload your images</h1>
             <Alert 
               variant="default" 
               className="bg-blue-50 text-blue-900 border-blue-200 dark:bg-blue-950 dark:text-blue-100 dark:border-blue-800"
@@ -48,17 +45,7 @@ export default function UploadPage() {
               </AlertDescription>
             </Alert>
           </div>
-          <FileUpload acceptedFileTypes={["image/jpeg", "image/jpg"]} />
-          
-          {/* Have multiple files to upload? */}
-          <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md mx-auto">
-            <Link href="/multi-upload" className="w-full">
-              <Button variant="blue" size="lg" className="w-full">
-                Multiple files? <ArrowRight className="size-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-
+          <MultiUpload />
           <div className="w-full max-w-sm mx-auto mt-4 mb-4">
             <FAQ />
           </div>
