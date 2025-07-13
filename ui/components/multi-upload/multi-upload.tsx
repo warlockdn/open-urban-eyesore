@@ -47,7 +47,7 @@ export default function MultiUpload() {
   });
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto space-y-6">
+    <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md mx-auto space-y-6">
       <FileUpload
         value={files}
         onValueChange={setFiles}
