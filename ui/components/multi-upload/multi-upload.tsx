@@ -73,7 +73,7 @@ export default function MultiUpload() {
               </p>
               <p className="text-muted-foreground text-xs flex items-center justify-center gap-1">
                 <MapPin className="size-3" />
-                Images must be taken in Bengaluru with GPS data
+                Images must be taken in {process.env.NEXT_PUBLIC_CITY_NAME} with GPS data
               </p>
             </div>
           </div>

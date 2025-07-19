@@ -2,7 +2,7 @@
 
 import { Plus, Minus, RotateCcw, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { BENGALURU_CENTER } from "./map-config"
+import { getCityCenter } from "./map-config"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -32,7 +32,7 @@ export function MapControls({ mapInstance }: MapControlsProps) {
 
   const resetView = () => {
     if (mapInstance) {
-      mapInstance.setView(BENGALURU_CENTER, 12)
+      mapInstance.setView(getCityCenter(process.env.NEXT_PUBLIC_CITY_NAME!), 12)
     }
   }
 

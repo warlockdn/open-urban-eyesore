@@ -3,6 +3,41 @@ import { Map, Satellite, Mountain, Palette } from "lucide-react"
 // Bengaluru coordinates
 export const BENGALURU_CENTER: [number, number] = [12.9716, 77.5946]
 
+export const BENGALURU_BOUNDS: [[number, number], [number, number]] = [
+  [12.83, 77.45], // SW
+  [13.05, 77.72], // NE
+]
+
+// Guwahati coordinates
+export const GUWAHATI_CENTER: [number, number] = [26.1445, 91.7364]
+
+export const GUWAHATI_BOUNDS: [[number, number], [number, number]] = [
+  [26.12, 91.67], // SW
+  [26.20, 91.85], // NE
+]
+
+export const getCityBounds = (city: string) => {
+  switch (city) {
+    case "Bengaluru":
+      return BENGALURU_BOUNDS;
+    case "Guwahati":
+      return GUWAHATI_BOUNDS;
+    default:
+      return BENGALURU_BOUNDS;
+  }
+}
+
+export const getCityCenter = (city: string) => {
+  switch (city) {
+    case "Bengaluru":
+      return BENGALURU_CENTER;
+    case "Guwahati":
+      return GUWAHATI_CENTER;
+    default:
+      return BENGALURU_CENTER;
+  }
+}
+
 // Map layer configurations
 export const MAP_LAYERS = {
   street: {

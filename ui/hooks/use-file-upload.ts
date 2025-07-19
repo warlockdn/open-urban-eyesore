@@ -110,8 +110,8 @@ export function useFileUpload(options: FileUploadHookProps = {}) {
         const locationValidation = uploadCore.validateLocation(exifData);
         if (!locationValidation.valid) {
           toast.error(locationValidation.error || "Location validation failed", {
-            description: locationValidation.error === "Image is not in Bengaluru. Please upload the image from Bengaluru." 
-              ? "This is to ensure that the image is relevant to the city of Bengaluru."
+            description: locationValidation.error === `Image is not in ${process.env.NEXT_PUBLIC_CITY_NAME}. Please upload the image from ${process.env.NEXT_PUBLIC_CITY_NAME}.` 
+              ? `This is to ensure that the image is relevant to the city of ${process.env.NEXT_PUBLIC_CITY_NAME}.`
               : "Please ensure the image has GPS data.",
             position: "top-center",
           });
@@ -142,9 +142,9 @@ export function useFileUpload(options: FileUploadHookProps = {}) {
             } else if (error.message.includes("upload token")) {
               errorMessage = "Failed to generate upload token";
               errorDescription = "Please try again later.";
-            } else if (error.message.includes("Bengaluru")) {
-              errorMessage = "Image is not in Bengaluru";
-              errorDescription = "Please upload the image from Bengaluru.";
+            } else if (error.message.includes(process.env.NEXT_PUBLIC_CITY_NAME || "")) {
+              errorMessage = `Image is not in ${process.env.NEXT_PUBLIC_CITY_NAME}`;
+              errorDescription = `Please upload the image from ${process.env.NEXT_PUBLIC_CITY_NAME}.`;
             }
 
             toast.error(errorMessage, { 
