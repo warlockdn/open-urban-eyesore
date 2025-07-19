@@ -14,7 +14,7 @@ export function GeneralMessageModal({ open, setOpen }: { open: boolean, setOpen:
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent className="max-w-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Bengaluru Live Pothole Map</AlertDialogTitle>
+          <AlertDialogTitle>{process.env.NEXT_PUBLIC_CITY_NAME} Live Pothole Map</AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-muted-foreground">
           A <strong>community-powered</strong> platform to report potholes and damaged roads.
           <br/>

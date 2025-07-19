@@ -76,6 +76,7 @@ const useImageKitUpload = () => {
         signature,
         publicKey,
         file: compressedImage,
+        folder: process.env.NEXT_PUBLIC_IMAGEKIT_FOLDER || "",
         fileName: randomFileNameGenerator() + file.name.split(".").pop(),
         // Progress callback to update upload progress state
         onProgress: (event) => {

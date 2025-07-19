@@ -5,7 +5,7 @@ import exifReader from "exifreader";
 import { toast } from "sonner";
 
 import useImageKitUpload from "@/components/upload/imagekit";
-import { convertExifToFormattedString, isInBengaluru, reportToSentry } from "@/lib/utils";
+import { convertExifToFormattedString, isInCity, reportToSentry } from "@/lib/utils";
 
 export interface UploadCoreOptions {
   acceptedFileTypes?: string[];
@@ -96,10 +96,10 @@ export function useUploadCore(options: UploadCoreOptions = {}) {
         };
       }
 
-      if (!isInBengaluru(lat, lng)) {
+      if (!isInCity(lat, lng)) {
         return {
           valid: false,
-          error: "Image is not in Bengaluru. Please upload the image from Bengaluru.",
+          error: `Image is not in ${process.env.NEXT_PUBLIC_CITY_NAME}. Please upload the image from ${process.env.NEXT_PUBLIC_CITY_NAME}.`,
         };
       }
 

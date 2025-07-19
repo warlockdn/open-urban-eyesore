@@ -10,7 +10,7 @@ import L from "leaflet"
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useIsMobile } from "@/hooks/use-mobile"
 
-import { BENGALURU_CENTER, MAP_LAYERS } from "./map/map-config"
+import { getCityCenter, MAP_LAYERS } from "./map/map-config"
 import { MapLoadHandler } from "./map/map-load-handler"
 import { MapControls } from "./map/map-controls"
 import { LayerMenu } from "./map/layer-menu"
@@ -48,7 +48,7 @@ export default function SimilarMapScreen() {
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
   const [filteredPoints, setFilteredPoints] = useState<any[]>([])
-  const [mapCenter, setMapCenter] = useState<[number, number]>(BENGALURU_CENTER)
+  const [mapCenter, setMapCenter] = useState<[number, number]>(getCityCenter(process.env.NEXT_PUBLIC_CITY_NAME!))
   const [zoomLevel, setZoomLevel] = useState(16)
   
   const searchParams = useSearchParams()

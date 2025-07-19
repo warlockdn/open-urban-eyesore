@@ -10,7 +10,7 @@ import L from "leaflet"
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useIsMobile } from "@/hooks/use-mobile"
 
-import { BENGALURU_CENTER, MAP_LAYERS } from "./map/map-config"
+import { getCityBounds, getCityCenter, MAP_LAYERS } from "./map/map-config"
 import { MapLoadHandler } from "./map/map-load-handler"
 import { MapControls } from "./map/map-controls"
 import { LayerMenu } from "./map/layer-menu"
@@ -32,12 +32,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "/placeholder.svg?height=25&width=25",
 })
 
-// Add bounding box for Bengaluru (TODO: Make this dynamic)
-const BENGALURU_BOUNDS: [[number, number], [number, number]] = [
-  [12.83, 77.45], // SW
-  [13.05, 77.72], // NE
-]
-
 export default function MapScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [selectedLayer, setSelectedLayer] = useState("street")
@@ -49,7 +43,7 @@ export default function MapScreen() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const hasSeenModal = localStorage.getItem("bengaluru-map-intro-seen");
+    const hasSeenModal = localStorage.getItem("map-intro-seen");
     if (!hasSeenModal) {
       setIsMessageModalOpen(true);
     }
@@ -68,14 +62,14 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (isMobile && mapInstance) {
-      mapInstance.fitBounds(BENGALURU_BOUNDS);
+      mapInstance.fitBounds(getCityBounds(process.env.NEXT_PUBLIC_CITY_NAME!));
     }
   }, [isMobile, mapInstance]);
 
   const handleModalOpenChange = (isOpen: boolean) => {
     setIsMessageModalOpen(isOpen);
     if (!isOpen) {
-      localStorage.setItem("bengaluru-map-intro-seen", "true");
+      localStorage.setItem("map-intro-seen", "true");
     }
   };
 
@@ -84,8 +78,8 @@ export default function MapScreen() {
       {/* Map Container */}
       <MapContainer
         {...(isMobile
-          ? { bounds: BENGALURU_BOUNDS, maxBounds: BENGALURU_BOUNDS }
-          : { center: BENGALURU_CENTER, zoom: 12 })}
+          ? { bounds: getCityBounds(process.env.NEXT_PUBLIC_CITY_NAME!), maxBounds: getCityBounds(process.env.NEXT_PUBLIC_CITY_NAME!) }
+          : { center: getCityCenter(process.env.NEXT_PUBLIC_CITY_NAME!), zoom: 12 })}
         maxZoom={18}
         minZoom={11}
         className="h-full w-full"
@@ -154,7 +148,7 @@ export default function MapScreen() {
 
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999]">
         <div className="bg-background rounded-full shadow-lg border px-4 py-2">
-          <h1 className="text-lg font-bold text-foreground whitespace-nowrap">Bengaluru Live Potholes Map</h1>
+          <h1 className="text-lg font-bold text-foreground whitespace-nowrap">{process.env.NEXT_PUBLIC_CITY_NAME} Live Potholes Map</h1>
         </div>
       </div>
 

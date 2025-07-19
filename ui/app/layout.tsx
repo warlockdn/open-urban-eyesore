@@ -4,7 +4,7 @@ import '../styles/globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export const metadata: Metadata = {
-  title: 'Bengaluru Live Pothole Map',
+  title: `${process.env.NEXT_PUBLIC_CITY_NAME} Live Pothole Map`,
   description: 'A community-powered platform to report potholes and damaged roads.',
 }
 

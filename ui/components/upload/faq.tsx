@@ -60,7 +60,7 @@ export function FAQ() {
         <AccordionTrigger>Who runs this platform?</AccordionTrigger>
         <AccordionContent className="flex flex-col gap-4 text-balance">
           <p>
-            This platform is run by volunteers from the Bengaluru community. <br/>
+            This platform is run by volunteers from the {process.env.NEXT_PUBLIC_CITY_NAME} community. <br/>
             We are a group of people who are passionate about the city and want to make it a better place. <br/>
             We are not affiliated with any government or organization. <br/>
           </p>

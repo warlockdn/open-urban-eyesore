@@ -19,9 +19,9 @@ export function getColor(category: number) {
 
 /**
  * TOTO: implement this
- * Util to tell if the given lat and lng are in the range of Bengaluru
+ * Util to tell if the given lat and lng are in the range of City
  */
-export function isInBengaluru(lat: number, lng: number) {
+export function isInCity(lat: number, lng: number) {
   return true
   // return lat >= 12.9716 && lat <= 13.0437 && lng >= 77.5536 && lng <= 77.6172;
 }
