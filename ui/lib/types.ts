@@ -7,3 +7,16 @@ export interface MapPoint {
   category: number;
   created_at?: string;
 }
+
+export interface Submission {
+  /** Issue ID - For the UI */
+  id: number;
+  /** Issue number */
+  number: number;
+  /** Issue state */
+  state: string;
+  /** Issue labels */
+  labels: string[];
+  /** Issue URL */
+  url: string;
+}

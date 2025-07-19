@@ -127,7 +127,10 @@ export function LayerMenu({ isOpen, selectedLayer, onLayerChange, mapInstance }:
               <Link href="/upload">Upload</Link>
             </Button>
             <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link href="/changelog">Changelog</Link>
+              <Link href="/multi-upload">Multi Upload</Link>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <Link href="/submissions">Submissions</Link>
             </Button>
           </div>
         </div>

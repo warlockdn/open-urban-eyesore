@@ -62,5 +62,8 @@ ${yamlContent}
 		labels: [GithubIssueLabels.new],
 	});
 
-	return issue.data.html_url;
+	return {
+		issueUrl: issue.data.html_url,
+		issueNumber: issue.data.number,
+	};
 }

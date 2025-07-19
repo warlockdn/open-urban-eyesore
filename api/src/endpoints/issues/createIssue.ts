@@ -67,7 +67,7 @@ export class CreateIssue extends OpenAPIRoute {
 
 			return c.json({
 				success: true,
-				issueUrl: await createIssue(mapPoint),
+				issue: await createIssue(mapPoint),
 			});
 
 		} catch (error) {

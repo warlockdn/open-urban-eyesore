@@ -8,6 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 import { FAQ } from "@/components/upload/faq";
 
+const HistoricalSubmissions = dynamic(
+  () => import("@/components/historical-submissions"),
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-32 flex items-center justify-center"><Skeleton className="w-full h-24" /></div>,
+  }
+)
+
 function MultiUploadSkeleton() {
   return (
     <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md mx-auto">
@@ -33,6 +41,8 @@ export default function MultiUploadPage() {
         <DisclaimerAlert open={open} setOpen={setOpen} />
 
         <div className="flex flex-col items-center justify-evenly min-h-screen gap-4">
+
+          {/* Disclaimer */}
           <div className="flex flex-col items-center justify-center gap-4 w-full max-w-md mx-auto">
             <h1 className="text-2xl font-bold mb-4">Upload your images</h1>
             <Alert 
@@ -45,7 +55,11 @@ export default function MultiUploadPage() {
               </AlertDescription>
             </Alert>
           </div>
+
+          {/* Multi Upload */}
           <MultiUpload />
+
+          {/* FAQ */}
           <div className="w-full max-w-sm mx-auto mt-4 mb-4">
             <FAQ />
           </div>
