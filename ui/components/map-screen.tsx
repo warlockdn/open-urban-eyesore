@@ -1,14 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { MapContainer, TileLayer } from "react-leaflet"
-import { Menu, X } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button"
-import "leaflet/dist/leaflet.css"
+import { useEffect, useState, useRef, lazy, Suspense } from "react"
+
 import L from "leaflet"
-import MarkerClusterGroup from 'react-leaflet-cluster';
+import { MapContainer, TileLayer } from "react-leaflet"
+import { FeatureGroup } from "react-leaflet"
+import { EditControl } from "react-leaflet-draw"
+import { area } from "@turf/area"
+import { point } from "@turf/helpers"
+import { booleanPointInPolygon } from "@turf/boolean-point-in-polygon"
+
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useMapData } from "@/hooks/use-map-data"
 
 import { getCityBounds, getCityCenter, MAP_LAYERS } from "./map/map-config"
 import { MapLoadHandler } from "./map/map-load-handler"
@@ -16,14 +19,13 @@ import { MapControls } from "./map/map-controls"
 import { LayerMenu } from "./map/layer-menu"
 import { LoadingOverlay } from "./map/loading-overlay";
 import { Legend } from "./map/legent"
-import { ThemeManager } from "./theme-manager"
-
-import { HoverMarker } from "./map/hover-marker"
-import { MapData } from "@/types"
-import { MapPoint } from "@/lib/types"
-import { getColor } from "@/lib/utils"
-import { FloatingCard } from "./map/floating-card"
+import { MapMarkers } from "./map/map-markers"
 import { GeneralMessageModal } from "./message-modal"
+import { MapPoint } from "@/types"
+
+import "leaflet/dist/leaflet.css"
+import "leaflet-draw/dist/leaflet.draw.css"
+import "@/styles/leaflet-draw-custom.css"
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -32,30 +34,29 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "/placeholder.svg?height=25&width=25",
 })
 
+const SelectionSidebar = lazy(() => import("@/components/selection-sidebar"))
+const MapUIOverlay = lazy(() => import("@/components/map/map-ui-overlay"))
+const FloatingCard = lazy(() => import("@/components/map/floating-card"))
+
 export default function MapScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [selectedLayer, setSelectedLayer] = useState("street")
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
-  const [mapData, setMapData] = useState<MapData | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<Partial<MapPoint> | null>(null)
+  const [selectedPoints, setSelectedPoints] = useState<Partial<MapPoint>[]>([])
+  const [isSelectionSheetOpen, setIsSelectionSheetOpen] = useState(false)
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false)
-  const isMobile = useIsMobile();
+  
+  const featureGroupRef = useRef<L.FeatureGroup | null>(null)
+  const { mapData, isLoading } = useMapData()
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const hasSeenModal = localStorage.getItem("map-intro-seen");
     if (!hasSeenModal) {
       setIsMessageModalOpen(true);
     }
-  }, []);
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API}/api/data`)
-      .then((res) => res.json())
-      .then((data) => {
-        setMapData(data.result as MapData)
-      })
-      .catch((err) => console.error(err));
   }, []);
 
   const currentLayer = MAP_LAYERS[selectedLayer as keyof typeof MAP_LAYERS]
@@ -74,7 +75,10 @@ export default function MapScreen() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-gray-100">
+    <div className="flex h-screen w-screen overflow-hidden bg-gray-100">
+      {/* Map Section */}
+      <div className="relative h-full w-full">
+
       {/* Map Container */}
       <MapContainer
         {...(isMobile
@@ -84,77 +88,101 @@ export default function MapScreen() {
         minZoom={11}
         className="h-full w-full"
         zoomControl={false}
-        style={{ height: "100vh", width: "100vw" }}
+        style={{ height: "100vh", width: "100%" }}
       >
         <TileLayer
           url={currentLayer.url}
           attribution={currentLayer.attribution}
           key={selectedLayer}
         />
+
+        <FeatureGroup ref={featureGroupRef as any}>
+          <EditControl
+            position="bottomleft"
+            onCreated={(e: any) => {
+              if (!mapData) return
+              const layer = e.layer
+              let points: any[] = []
+
+              // Circle selection
+              if (layer instanceof L.Circle) {
+                const center = layer.getLatLng()
+                const radius = layer.getRadius() // in meters
+
+                if (radius > 5000) {
+                  alert("Selection radius cannot exceed 5 km")
+                  featureGroupRef.current?.removeLayer(layer)
+                  return
+                }
+
+                points = mapData.data.filter((p) => {
+                  const dist = mapInstance?.distance(center, L.latLng(p.lat, p.long)) ?? 0
+                  return dist <= radius
+                })
+              } else {
+                // Polygon or rectangle
+                const geojson = layer.toGeoJSON()
+                const _area = area(geojson) // in m^2
+                if (_area > 80_000_000) { // approx area of circle radius 5km => 78.5 km2
+                  alert("Selection area cannot exceed ~5 km radius")
+                  featureGroupRef.current?.removeLayer(layer)
+                  return
+                }
+
+                points = mapData.data.filter((p) => {
+                  const pt = point([p.long, p.lat])
+                  return booleanPointInPolygon(pt, geojson as any)
+                })
+              }
+
+              setSelectedPoints(points)
+              if (points.length > 0) {
+                setIsSelectionSheetOpen(true)
+              }
+            }}
+            draw={{
+              rectangle: true,
+              polygon: false,
+              circle: false,
+              marker: false,
+              polyline: false,
+              circlemarker: false,
+            }}
+            edit={{
+              edit: false,
+              remove: false,
+            }}
+          />
+        </FeatureGroup>
+
         <MapLoadHandler onMapLoad={() => setIsMapLoaded(true)} onMapInstance={setMapInstance} />
         
-        {/* Render points as markers */}
-        <MarkerClusterGroup
-          chunkedLoading={true}
-          maxClusterRadius={20}
-          disableClusteringAtZoom={16}
-          iconCreateFunction={(cluster: any) => {
-
-            const markers = cluster.getAllChildMarkers();
-            const category = markers[0]?.options.icon?.options?.iconUrl?.match(/category='([^']+)'/)?.[1] || "#3498db";
-
-            const color = getColor(Number(category))
-
-            return L.divIcon({
-              html: `<svg width="40" height="40"><circle cx="20" cy="20" r="18" fill="${color}" /><text x="20" y="25" text-anchor="middle" fill="#fff" font-size="16">${cluster.getChildCount()}</text></svg>`,
-              className: "custom-cluster-icon",
-              iconSize: [40, 40],
-            });
-          }}
-        >
-          {mapData?.data?.map((point, idx) => (
-            <HoverMarker 
-              point={point} 
-              idx={idx} 
-              key={idx} 
-              onMarkerClick={setSelectedPoint}
-            />
-          ))}
-        </MarkerClusterGroup>
+        <MapMarkers 
+          mapData={mapData}
+          onMarkerClick={setSelectedPoint}
+        />
       </MapContainer>
 
       <GeneralMessageModal open={isMessageModalOpen} setOpen={handleModalOpenChange} />
 
       {selectedPoint && (
-        <FloatingCard 
-          point={selectedPoint} 
-          onClose={() => setSelectedPoint(null)} 
-        />
+        <Suspense fallback={null}>
+          <FloatingCard 
+            point={selectedPoint} 
+            onClose={() => setSelectedPoint(null)} 
+          />
+        </Suspense>
       )}
 
-      <LoadingOverlay isVisible={!isMapLoaded} />
+      <LoadingOverlay isVisible={!isMapLoaded && isLoading} />
 
-      {/* Floating Menu Button */}
-      <div className="absolute top-4 left-4 z-[1000]">
-        <Button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          size="icon"
-          className="h-12 w-12 rounded-full shadow-lg bg-background text-foreground hover:bg-accent hover:text-accent-foreground border"
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-        >
-          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
-      </div>
-
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[999]">
-        <div className="bg-background rounded-full shadow-lg border px-4 py-2">
-          <h1 className="text-lg font-bold text-foreground whitespace-nowrap">{process.env.NEXT_PUBLIC_CITY_NAME} Live Potholes Map</h1>
-        </div>
-      </div>
-
-      <div className="absolute top-4 right-4 z-[1000]">
-        <ThemeManager />
-      </div>
+      <Suspense fallback={null}>
+        <MapUIOverlay 
+          isMenuOpen={isMenuOpen}
+          onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+          cityName={process.env.NEXT_PUBLIC_CITY_NAME!}
+        />
+      </Suspense>
 
       <MapControls mapInstance={mapInstance} />
       <Legend />
@@ -165,19 +193,19 @@ export default function MapScreen() {
         onLayerChange={setSelectedLayer}
         mapInstance={mapInstance}
       />
+      </div>{/* end map section */}
 
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-[999]">
-        <Link href="/upload">
-          <button aria-label="Upload and Contribute" className="shadow-[0_4px_14px_0_rgb(0,118,255,39%)] hover:shadow-[0_6px_20px_rgba(0,118,255,23%)] hover:bg-[rgba(0,118,255,0.9)] px-8 py-2 bg-[#0070f3] rounded-md text-white font-light transition duration-1000 ease-linear animate-[breathing_4s_ease-in-out_infinite] hover:animate-none">
-            Upload and Contribute
-          </button>
-        </Link>
-      </div>
-
-      {/* Overlay to close menu */}
-      {isMenuOpen && (
-        <div className="absolute inset-0 z-[998] bg-black bg-opacity-20" onClick={() => setIsMenuOpen(false)} />
-      )}
+      <Suspense fallback={null}>
+        <SelectionSidebar 
+          items={selectedPoints} 
+          open={isSelectionSheetOpen}
+          onOpenChange={setIsSelectionSheetOpen}
+                  onClear={() => {
+          setSelectedPoints([])
+          featureGroupRef.current?.clearLayers()
+        }} 
+        />
+      </Suspense>
     </div>
   )
 }

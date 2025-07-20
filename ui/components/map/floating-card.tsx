@@ -9,7 +9,7 @@ interface FloatingCardProps {
   onClose: () => void
 }
 
-export function FloatingCard({ point, onClose }: FloatingCardProps) {
+export default function FloatingCard({ point, onClose }: FloatingCardProps) {
   return (
     <div className="absolute right-4 top-4 z-[1000] w-80">
       <Card>
