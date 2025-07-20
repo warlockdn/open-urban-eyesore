@@ -12,9 +12,14 @@ const MapScreen = dynamic(() => import("../components/map-screen"), {
   ),
 })
 
+const FreeFormPointSelectionInfoModal = dynamic(() => import("@/components/free-form-point-selection-info-modal"), {
+  ssr: false,
+})
+
 export default function Home() {
   return (
     <div className="h-screen w-screen overflow-hidden">
+      <FreeFormPointSelectionInfoModal />
       <MapScreen />
     </div>
   )
