@@ -20,7 +20,7 @@ export function LayerMenu({ isOpen, selectedLayer, onLayerChange, mapInstance }:
   return (
     <div
       className={cn(
-        "absolute top-0 left-0 z-[999] h-full bg-background border-r",
+        "absolute top-0 left-0 z-[1001] h-full bg-background border-r",
         "transform transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
