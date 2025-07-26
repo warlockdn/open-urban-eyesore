@@ -1,5 +1,4 @@
-import { MapPoint, UploadResponse } from "../types";
-import { env } from "cloudflare:workers";
+import { MapPoint } from "../types";
 import { createIssue } from "./issue";
 
 export async function uploadImage(image: { url: string, thumbnailUrl: string }, lat: number, lng: number) {
@@ -10,7 +9,8 @@ export async function uploadImage(image: { url: string, thumbnailUrl: string }, 
       image: image.url,
       image_thumb: image.thumbnailUrl
     }
-  
+
+    console.log('Uploading image', mapPoint);
     const issueUrl = await createIssue(mapPoint);
     console.log('Issue created successfully', JSON.stringify(mapPoint));
     return issueUrl;
