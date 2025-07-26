@@ -41,7 +41,8 @@
 		"IMAGEKIT_PUBLIC_KEY": "",
 		"IMAGEKIT_PRIVATE_KEY": "",
 		"IMAGEKIT_URL_ENDPOINT": "",
-		"PLATFORM_URL": ""
+		"PLATFORM_URL": "",
+		"CITY_NAME": ""
 	},
 	/**
 	 * Note: Use secrets to store sensitive data.

@@ -7,6 +7,8 @@ import { determineRegion } from "../utils/moderator";
 export async function createIssue(data: Partial<MapPoint>) {
   const { lat, long, image, image_thumb } = data;
 	
+	console.log("Creating Issue: ", data);
+
 	// Initialize Octokit
 	const octokit = new Octokit({
 		auth: env.GITHUB_TOKEN,
