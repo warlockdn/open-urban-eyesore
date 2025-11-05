@@ -6,10 +6,7 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "cf-typegen": "wrangler types",
-    "dev:https": "wrangler dev --local --local-protocol https",
-    "dev:tunnel": "devtunnel host -p 8787 --allow-anonymous",
-    "dev:tunnel:stop": "devtunnel stop"
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@octokit/core": "^7.0.2",

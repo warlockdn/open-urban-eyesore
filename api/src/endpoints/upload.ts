@@ -116,7 +116,8 @@ export class ImageUpload extends OpenAPIRoute {
 				}, 400);
 			}
 
-			await uploadImage(image, lat, lng);
+			console.log("Uploading image", image, lat, lng);
+			c.executionCtx.waitUntil(uploadImage(image, lat, lng));
 
 			return c.json({
 				success: true,
